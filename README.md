@@ -11,8 +11,10 @@ $ENV:INFLUX_SERVER = "http://influxdb.server.com:8086"
 $ENV:INFLUX_DB     = "mydb"
 ```
 
-Load with `import-module psinflux`.
+Load with `import-module psinflux`. You can use normal PowerShell commands to get help:
 
+* List of functions: `gcm -Module psinflux`
+* Help for function: `man iq`
 
 ### Query
 
@@ -24,7 +26,7 @@ iq select value,tag from measure limit 20
 
 For convenience, you don't have to (generally) put a query in PowerShell string.
 
-**NOTE**: `iq` (influx query) function parses returned data into PowerShell objects which can be slow for large number of points. Use `iqr` (raw query) ton large collections instead.
+**NOTE**: `iq` (influx query) function parses returned data into PowerShell objects which can be slow for large number of points. Use `iqr` (raw query) to get large collections.
 
 Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
 
@@ -33,17 +35,18 @@ Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predef
 To write data points to the database use `Send-Data` function:
 
 ```powershell
-Send-Data "cpu,host=$Env:COMPUTERNAME,user=$Env:USERNAME value=$(Get-Counter '\Processor(_Total)\% Processor Time' | % CounterSamples | % CookedValue)"
+$cpu_load = Get-Counter '\Processor(_Total)\% Processor Time' | % CounterSamples | % CookedValue
+Send-Data "cpu,host=$Env:COMPUTERNAME,user=$Env:USERNAME value=$cpu_load"
 ```
 
-You can use `[DateTime]::UtcNow.ToString('o')` to send date time instead of nanoseconds until Unix epoch. To do that specify parameter `$UseRoundTripTime`.
+You can use `[DateTime]::UtcNow.ToString('o')` to send date time instead of nanoseconds until Unix epoch. If you do that, pass parameter `$UseRoundTripTime` to make function automatically convert time points to correct format.
 
-For many points, send array of strings.
+You can also send an array of strings:
+
+```powershell
+$time = [DateTime]::UtcNow.ToString('o')
+Send-Data "test1 value=1 $time", "test2 value=2 $time" -RoundTripTime
+```
 
 
-
-## Usage
-
-* Functions: `gcm -Module psinflux`
-* Use man for help: `man iq`
 
