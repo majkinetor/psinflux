@@ -30,6 +30,8 @@ For convenience, you don't generally have to put a query inside a PowerShell str
 
 Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
 
+![screen.gif](https://cdn.rawgit.com/majkinetor/psinflux/1cd398bc/screen.gif)
+
 ### Writing data
 
 To write data points to the database use `Send-Data` function:
