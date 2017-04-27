@@ -1,0 +1,46 @@
+$SELECT_MEASUREMENT = { iqr show measurements | % values | fzf "Select measurement" | set LAST_MEASUREMENT; $LAST_MEASUREMENT }
+$SELECT_TAG         = { iqr show tag keys from $LAST_MEASUREMENT | % values | fzf "Select tag" | set LAST_TAG; $LAST_TAG }
+$SELECT_DB          = { iqr show databases | % values | fzf  "Select Influx DB" | set LAST_DB; $LAST_DB }
+$SELECT_USER        = { iqr show users | % values | fzf "Select user" }
+$SELECT_COLS        = { (iqr select * from $(. $SELECT_MEASUREMENT) LIMIT 1 | % columns | fzf "Select 1 or more (with TAB key) fields/tags") -join ',' }
+$SELECT_RP          = { iq show retention policies on $(. $SELECT_DB) | % name | fzf "Select retention policy" }
+
+$INPUT_DB           = { Read-Host 'DB Name' }
+$INPUT_RP           = { Read-Host 'Retention Policy Name' }
+$INPUT_DURATION     = { '10m', '30m', '1h', '2h', '12h', '1d', '2d', '7d', '14d', '30d', '60d', '12w', '24w', '52w', '160w', '260w', '520w', 'INF' | fzf 'Select or type input duration:' -Edit | select -Last 1 }
+$INPUT_USER         = { Read-Host "User name" }
+$INPUT_PASS         = { Read-Host "Password" }
+
+---
+
+select $SELECT_COLS from $LAST_MEASUREMENT limit 25
+
+show databases
+create database $INPUT_DB
+drop database $SELECT_DB
+
+# Shema exploratin
+# https://docs.influxdata.com/influxdb/v0.9/query_language/schema_exploration/#explore-field-keys-with-show-field-keys
+show series
+show series from $SELECT_MEASUREMENT
+show measurements
+show tag keys from $SELECT_MEASUREMENT
+show tag values from $SELECT_MEASUREMENT with key = $SELECT_TAG
+show field keys from $SELECT_MEASUREMENT
+delete from $SELECT_MEASUREMENT
+
+show retention policies on $SELECT_DB
+create retention policy $INPUT_RP on $SELECT_DB duration $INPUT_DURATION replication 1 default
+drop retention policy $SELECT_RP on $LAST_DB
+
+show continuous queries
+#CREATE CONTINUOUS QUERY $INPUT_CQ ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END
+#DROP CONTINUOUS QUERY "cq_name" ON "db_name"
+
+show users
+create user $INPUT_USER with password $INPUT_PASS
+create user $INPUT_USER with PASSWORD $INPUT_PASS with all privileges
+drop user $SELECT_USER
+
+show stats
+show diagnostics
