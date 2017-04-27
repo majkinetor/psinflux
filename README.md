@@ -20,13 +20,13 @@ Load with `import-module psinflux`. You can use normal PowerShell commands to ge
 
 Use `iq` (alias for `Send-Query`) to query the database:
 
-```
+```powershell
 iq select value,tag from measure limit 20
 ```
 
-For convenience, you don't have to (generally) put a query in PowerShell string.
+For convenience, you don't generally have to put a query inside a PowerShell string.
 
-**NOTE**: `iq` (influx query) function parses returned data into PowerShell objects which can be slow for large number of points. Use `iqr` (raw query) to get large collections.
+`iq` (influx query) function parses returned data into PowerShell objects which can be slow for large number of points. Use `iqr` (raw query) to get large collections.
 
 Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
 
