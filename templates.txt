@@ -19,7 +19,7 @@ show databases
 create database $INPUT_DB
 drop database $SELECT_DB
 
-# Shema exploratin
+# Shema exploration
 # https://docs.influxdata.com/influxdb/v0.9/query_language/schema_exploration/#explore-field-keys-with-show-field-keys
 show series
 show series from $SELECT_MEASUREMENT

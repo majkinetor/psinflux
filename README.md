@@ -28,7 +28,15 @@ For convenience, you don't generally have to put a query inside a PowerShell str
 
 `iq` (influx query) function parses returned data into PowerShell objects which can be slow for large number of points. Use `iqr` (raw query) to get large collections.
 
+### Templates
+
 Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
+
+[Default template](https://github.com/majkinetor/psinflux/blob/master/templates.txt) is always used and has several predefined queries and selectors/input methods. You can add your own template by using a `$FilePath` parameter or setting `$Env:INFLUX_TEMPLATE` environment variable.
+
+Query templates are text files that contain two sections: powershell code and query sentences. Two sections are separated by '---' line. Comments are marked with #.
+
+User can define small Powershell helper scriptblocks and Powershell variables that serve to replace query placeholders, marked with `$PLACEHOLDER` keywords. There are 2 specially named placeholders, those starting with `SELECT_` or `INPUT_` that are replaced with scriptblock invocations. Other $ prefixed words are simple PowerShell variables.
 
 ![screen.gif](https://cdn.rawgit.com/majkinetor/psinflux/1cd398bc/screen.gif)
 

@@ -123,16 +123,26 @@ sal iqr Send-RawQuery
 
 .PARAMETER Selection
     Word that uniquelly describes one query to be executed on the start.
-
+.PARAMETER FilePath
+    Template file path to be added in adition to the default one. By default $Env:INFLUX_TEMPLATE.
 .LINK
     https://chocolatey.org/packages/fzf
 #>
-function Invoke-Template([string]$Selection) {
+function Invoke-Template([string]$Selection, [string]$FilePath=$Env:INFLUX_TEMPLATE) {
 
-    $t = gc $PSScriptRoot\templates.txt -Raw
-    $code  = if ($t -match '(?s)^.+(?=\n---\s*\n)') { $matches[0] }
-    $lines = $t -replace '(?s)^.+\n---\s*\n|(?<=\n)#.+?\n'
-    iex $code
+    function load_template($path) {
+        if (!$FilePath -or !(Test-Path $FilePath)) { Write-Warning "Invalid template path: $FilePath"; sleep 1; return }
+        $t = gc $FilePath -Raw
+        $c = if ($t -match '(?s)^.+(?=\n---\s*\n)') { $matches[0] }
+        $l = $t -replace '(?s)^.+\n---\s*\n|(?<=\n)#.+?\n'
+        $code += $c + "`n"; $lines += $l + "`n"
+    }
+    
+    $paths = @("$PSScriptRoot\templates.txt") + $FilePath
+    $code = $lines = ''
+    foreach ($path in $paths) { load_template $path }
+
+    iex $code   
 
     if ($Selection) {
         $sel = $Selection -replace '.', '$0*'
