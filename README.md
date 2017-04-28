@@ -2,6 +2,8 @@
 
 This Powershell 3+ module uses Influx DB [HTTP API](https://docs.influxdata.com/influxdb/v1.2/guides/querying_data) to query and send data.
 
+To install, clone this project then run: `cinst fzf; ./install.ps1`
+
 ## How to use
 
 Set the following environment variables or put them in $PROFILE:
