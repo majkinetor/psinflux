@@ -1,6 +1,6 @@
 # PSInflux
 
-This Powershell module uses Influx DB [HTTP API](https://docs.influxdata.com/influxdb/v1.2/guides/querying_data) to query and send data.
+This Powershell 3+ module uses Influx DB [HTTP API](https://docs.influxdata.com/influxdb/v1.2/guides/querying_data) to query and send data.
 
 ## How to use
 
@@ -30,7 +30,7 @@ For convenience, you don't generally have to put a query inside a PowerShell str
 
 ### Templates
 
-Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
+Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://github.com/junegunn/fzf) (install via chocolatey: [`cinst fzf`](https://chocolatey.org/packages/fzf)) fuzzy finder as input selector.
 
 [Default template](https://github.com/majkinetor/psinflux/blob/master/templates.txt) is always used and has several predefined queries and selectors/input methods. You can add your own template by using a `$FilePath` parameter or setting `$Env:INFLUX_TEMPLATE` environment variable. User template is then merged with the default one.
 
