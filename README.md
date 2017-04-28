@@ -38,6 +38,16 @@ Query templates are text files that contain two sections: powershell code and qu
 
 User can define small Powershell helper scriptblocks and Powershell variables that serve to replace query placeholders, marked with `$PLACEHOLDER` keywords. There are 2 specially named placeholders, those starting with `SELECT_` or `INPUT_` that are replaced with scriptblock invocations. Other $ prefixed words are simple PowerShell variables. Default template defines few generally useful selectors can be reused in user template.
 
+For example, user template can look like this:
+
+```
+$SELECT_CPU_FIELDS = { ( iq show field keys from cpu  | % fieldkey | fzf "Select 1 or more CPU (with TAB key) fields/tags") -join ',' }
+
+---
+
+select $SELECT_CPU_FIELDS from cpu limit 50    # Select field from the CPU metric
+```
+
 ![screen.gif](https://cdn.rawgit.com/majkinetor/psinflux/1cd398bc/screen.gif)
 
 ### Writing data
