@@ -43,7 +43,7 @@ User can define small Powershell helper scriptblocks and Powershell variables th
 For example, user template can look like this:
 
 ```
-$SELECT_CPU_FIELDS = { ( iq show field keys from cpu  | % fieldkey | fzf "Select 1 or more CPU (with TAB key) fields/tags") -join ',' }
+$SELECT_CPU_FIELDS = { ( iq show field keys from cpu  | % fieldkey | fzf "Select 1 or more CPU (with TAB key) fields") -join ',' }
 
 ---
 
