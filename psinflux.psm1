@@ -131,18 +131,20 @@ sal iqr Send-RawQuery
 function Invoke-Template([string]$Selection, [string]$FilePath=$Env:INFLUX_TEMPLATE) {
 
     function load_template($path) {
-        if (!$FilePath -or !(Test-Path $FilePath)) { Write-Warning "Invalid template path: $FilePath"; sleep 1; return }
-        $t = gc $FilePath -Raw
+        if (!$path) { throw 'Empty template path' }
+        if (!(Test-Path $path)) { Write-Warning "Invalid template path: $path"; sleep 2; return }
+        $t = gc $path -Raw
         $c = if ($t -match '(?s)^.+(?=\n---\s*\n)') { $matches[0] }
         $l = $t -replace '(?s)^.+\n---\s*\n|(?<=\n)#.+?\n'
-        $code += $c + "`n"; $lines += $l + "`n"
+        return ($c + "`n"), ($l + "`n")
     }
-    
-    $paths = @("$PSScriptRoot\templates.txt") + $FilePath
-    $code = $lines = ''
-    foreach ($path in $paths) { load_template $path }
 
-    iex $code   
+    $paths = @("$PSScriptRoot\templates.txt")
+    if ($FilePath) { $paths += $FilePath }
+    $local:code = $lines = ''
+    foreach ($path in $paths) { $c, $l = load_template $path; $code += $c; $lines += $l }
+
+    iex $code
 
     if ($Selection) {
         $sel = $Selection -replace '.', '$0*'
@@ -154,6 +156,7 @@ function Invoke-Template([string]$Selection, [string]$FilePath=$Env:INFLUX_TEMPL
     if (!$query) { Write-Host 'Aborted'; return }
 
     $query = $query -replace '\$(SELECT|INPUT)[^ ]+', '$(. $0)'
+    $query = $query -replace '\s+#.+$'
     $equery = iex """$query"""
 
     Write-Host "QUERY:`n" "    iq $equery"

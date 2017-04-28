@@ -1,7 +1,7 @@
-$SELECT_MEASUREMENT = { iqr show measurements | % values | fzf "Select measurement" | set LAST_MEASUREMENT; $LAST_MEASUREMENT }
-$SELECT_TAG         = { iqr show tag keys from $LAST_MEASUREMENT | % values | fzf "Select tag" | set LAST_TAG; $LAST_TAG }
-$SELECT_DB          = { iqr show databases | % values | fzf  "Select Influx DB" | set LAST_DB; $LAST_DB }
-$SELECT_USER        = { iqr show users | % values | fzf "Select user" }
+$SELECT_MEASUREMENT = { iqr show measurements | % values | fzf "Select measurement" | set LAST_MEASUREMENT; if (!$LAST_MEASUREMENT) {break} else { $LAST_MEASUREMENT } }
+$SELECT_TAG         = { iqr show tag keys from $LAST_MEASUREMENT | % values | fzf "Select tag" | set LAST_TAG; if (!$LAST_TAG) {break} else {$LAST_TAG} }
+$SELECT_DB          = { iqr show databases | % values | fzf  "Select Influx DB" | set LAST_DB; if (!$LAST_DB) {break} else { $LAST_DB } }
+$SELECT_USER        = { iqr show users | % values | fzf "Select user" | set LAST_USER; if (!$LAST_USER) {break} else {$LAST_USER} }
 $SELECT_COLS        = { (iqr select * from $(. $SELECT_MEASUREMENT) LIMIT 1 | % columns | fzf "Select 1 or more (with TAB key) fields/tags") -join ',' }
 $SELECT_RP          = { iq show retention policies on $(. $SELECT_DB) | % name | fzf "Select retention policy" }
 

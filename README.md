@@ -32,11 +32,11 @@ For convenience, you don't generally have to put a query inside a PowerShell str
 
 Use `itemplate` (alias for `Invoke-Template`) to send predefined queries. Predefined queries can be added by the user and can contain PowerShell placeholders for getting the user input, for example metric or database name. Integrated templates use [fzf](https://chocolatey.org/packages/fzf) fuzzy finder as input selector.
 
-[Default template](https://github.com/majkinetor/psinflux/blob/master/templates.txt) is always used and has several predefined queries and selectors/input methods. You can add your own template by using a `$FilePath` parameter or setting `$Env:INFLUX_TEMPLATE` environment variable.
+[Default template](https://github.com/majkinetor/psinflux/blob/master/templates.txt) is always used and has several predefined queries and selectors/input methods. You can add your own template by using a `$FilePath` parameter or setting `$Env:INFLUX_TEMPLATE` environment variable. User template is then merged with the default one.
 
 Query templates are text files that contain two sections: powershell code and query sentences. Two sections are separated by '---' line. Comments are marked with #.
 
-User can define small Powershell helper scriptblocks and Powershell variables that serve to replace query placeholders, marked with `$PLACEHOLDER` keywords. There are 2 specially named placeholders, those starting with `SELECT_` or `INPUT_` that are replaced with scriptblock invocations. Other $ prefixed words are simple PowerShell variables.
+User can define small Powershell helper scriptblocks and Powershell variables that serve to replace query placeholders, marked with `$PLACEHOLDER` keywords. There are 2 specially named placeholders, those starting with `SELECT_` or `INPUT_` that are replaced with scriptblock invocations. Other $ prefixed words are simple PowerShell variables. Default template defines few generally useful selectors can be reused in user template.
 
 ![screen.gif](https://cdn.rawgit.com/majkinetor/psinflux/1cd398bc/screen.gif)
 
