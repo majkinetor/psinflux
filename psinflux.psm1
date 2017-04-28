@@ -45,7 +45,7 @@ function Send-Data( [string[]]$Lines, [string]$Server=$Env:INFLUX_SERVER, [strin
     #$authheader = "Basic " + ([Convert]::ToBase64String([System.Text.encoding]::ASCII.GetBytes("<username>:<password>")))
     #-Headers @{Authorization=$authheader}
     #$uri=”http://<hostname>:8086/write?db=test&precision=s”
-    iwr -UseBasicParsing -Method Post "$Server/write?db=$Db" -Body ($metrics -join "`n")
+    iwr -UseBasicParsing -Method Post "$Server/write?db=$Db" -Body ($metrics -join "`n") | select StatusCode, StatusDescription, Headers
 }
 
 <#
