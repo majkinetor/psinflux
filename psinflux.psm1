@@ -194,4 +194,4 @@ if (!$Env:INFLUX_DB) { Write-Warning "Environment variable `$Env:INFLUX_DB not d
     Write-Host -NoNewLine -Foreground green 'DB'.PadRight(10)
     Write-Host $ENV:INFLUX_DB "`n"
 }
-Export-ModuleMember -Function 'Send-Query', 'Send-RawQuery', 'Invoke-Template' -Alias *
+Export-ModuleMember -Function 'Send-Query', 'Send-RawQuery', 'Invoke-Template', 'Send-Data' -Alias *
