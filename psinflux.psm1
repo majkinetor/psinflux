@@ -160,7 +160,7 @@ function Invoke-Template([string]$Selection, [string]$FilePath=$Env:INFLUX_TEMPL
     $equery = iex """$query"""
 
     Write-Host "QUERY:`n" "    iq $equery"
-    iq $equery | ft -auto
+    iq $equery
 }
 sal itemplate invoke-template
 
