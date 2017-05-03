@@ -71,4 +71,36 @@ Send-Data "test1 value=1 $time", "test2 value=2 $time" -RoundTripTime
 ```
 
 
+Here is another example:
+
+```powershell
+PS> 1..10 | % { $x = 10*$_ + (Get-Random 10); Send-Data "test1 value=$x"; sleep 1 }
+
+StatusCode StatusDescription Headers
+---------- ----------------- -------
+       204 No Content        {[Request-Id, 03fed428-2fee-11e7-8c50-000000000000], [X-Influxdb-Version, 1.2.2], [Content-Type, application/json], [Date, Wed, 03 May 2017 10:48:17 GMT]}
+       204 No Content        {[Request-Id, 04997ca0-2fee-11e7-8c51-000000000000], [X-Influxdb-Version, 1.2.2], [Content-Type, application/json], [Date, Wed, 03 May 2017 10:48:18 GMT]}
+       ...
+
+ 
+PS> iq select value from test1 order by time desc
+
+time                           value
+----                           -----
+2017-05-03T10:48:26.893855822Z   109
+2017-05-03T10:48:25.841784978Z    94
+2017-05-03T10:48:24.789887277Z    85
+2017-05-03T10:48:23.729787415Z    78
+2017-05-03T10:48:22.673721527Z    66
+2017-05-03T10:48:21.617741836Z    56
+2017-05-03T10:48:20.561755378Z    40
+2017-05-03T10:48:19.497824954Z    38
+2017-05-03T10:48:18.437837385Z    23
+2017-05-03T10:48:17.384615849Z    17
+```
+
+![test graph](https://cdn.rawgit.com/majkinetor/psinflux/test1.gif)
+
+
+
 
