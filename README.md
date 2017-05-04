@@ -99,7 +99,7 @@ time                           value
 2017-05-03T10:48:17.384615849Z    17
 ```
 
-![test graph](https://cdn.rawgit.com/majkinetor/psinflux/test1.gif)
+![test graph](https://cdn.rawgit.com/majkinetor/psinflux/2537038c/test1.png)
 
 
 
