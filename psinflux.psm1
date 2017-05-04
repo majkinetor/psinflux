@@ -53,8 +53,8 @@ function Send-Data( [string[]]$Lines, [string]$Server=$Env:INFLUX_SERVER, [strin
     Send metrics to statsd server.
 .DESCRIPTION
     Function sends metric data to statsd server.
-.PARAMETER Data
-    Metric data to send to statsd.  If string is not enclosed in quotes (single or double), the pipe character needs to be escaped.
+.PARAMETER Lines
+    Array of strings that contain statsd line protocol. If string is not enclosed in quotes (single or double), the pipe character needs to be escaped.
 .PARAMETER Ip
     IP address of the statsd server.
 .PARAMETER Port
@@ -69,26 +69,29 @@ function Send-Data( [string[]]$Lines, [string]$Server=$Env:INFLUX_SERVER, [strin
     Send-Statsd 'my_metric:321|g' -ip 10.0.0.10 -port 8180
 .LINK
     https://www.influxdata.com/getting-started-with-sending-statsd-metrics-to-telegraf-influxdb/
+    https://github.com/etsy/statsd/blob/master/docs/metric_types.md
 #>
 function Send-Statsd {
 
     param(
         [parameter(Mandatory=$true, ValueFromPipeline=$true)]
-        [string] $Data,
+        [string[]] $Lines,
 
         [parameter(Mandatory=$true)]
         [string] $Ip,
 
-        [int]    $Port   = 8125
+        [int]    $Port = 8125
     )
 
     $ipAddress = [System.Net.IPAddress]::Parse($ip)
 
-    $encodedData = [System.Text.Encoding]::ASCII.GetBytes($Data)
-
     $endPoint  = New-Object System.Net.IPEndPoint($ipAddress, $Port)
     $udpclient = New-Object System.Net.Sockets.UdpClient
-    $bytesSent = $udpclient.Send($encodedData, $encodedData.Length, $endPoint)
+
+    foreach ($line in $Lines) {
+        $encodedData = [System.Text.Encoding]::ASCII.GetBytes($line)
+        $bytesSent = $udpclient.Send($encodedData, $encodedData.Length, $endPoint)
+    }
 
     $udpclient.Close()
 }

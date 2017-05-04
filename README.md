@@ -102,5 +102,11 @@ time                           value
 ![test graph](https://cdn.rawgit.com/majkinetor/psinflux/2537038c/test1.png)
 
 
+#### Send to StatsD
 
+You can use `Send-Statsd` to write to Statsd server. The following example uses [Telegraf](https://www.influxdata.com/getting-started-with-sending-statsd-metrics-to-telegraf-influxdb/) as StatsD server so sending tags is supported:
+
+```powershell
+Send-Statsd "mycounter,host=${Env:COMPUTERNAME}:10|c", "mycounter,host=MEH:100|c" -Ip 127.0.0.1
+```
 
