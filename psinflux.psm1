@@ -242,4 +242,67 @@ if (!$Env:INFLUX_DB) { Write-Warning "Environment variable `$Env:INFLUX_DB not d
     Write-Host -NoNewLine -Foreground green 'DB'.PadRight(10)
     Write-Host $ENV:INFLUX_DB "`n"
 }
-Export-ModuleMember -Function 'Send-Query', 'Send-RawQuery', 'Invoke-Template', 'Send-Data', 'Send-Statsd' -Alias *
+
+
+<#
+.SYNOPSIS
+    Convert Custom PSoObjects to Line Protocol
+.DESCRIPTION
+    Funtion to convert Custom PSoObjects to Line Protocol strings
+.PARAMETER Object
+    Is a PSOject with names an values
+.PARAMETER hostname
+    Adds the host=exampelserver to the Line Protocol string 
+    Default it gets the localhostname
+.PARAMETER TagSet
+    Here you can specify your tags
+    Exampel -TagSet "region=uswest"
+    Exampel -TagSet "region=uswest,user=foo"
+.PARAMETER TimeStamp   
+    Here you can specify a TimeStamp in a [datetime] fromat
+    Exampel -TimeStamp (Get-Date)
+    Exampel -TimeStamp ($time)
+
+.EXAMPLE
+    ConvertTo-LineProtocoll -object $object -TagSet "station=11b" -timestamp (Get-Date)
+.EXAMPLE
+    ConvertTo-LineProtocoll -object $object -TagSet "unixsrv01" -timestamp $timedate
+.LINK
+https://docs.influxdata.com/influxdb/v1.3/write_protocols/line_protocol_reference/#syntax
+
+#>
+
+Function ConvertTo-LineProtocoll {
+    Param(
+        [Parameter(Mandatory = $true, HelpMessage = 'Custom PSObject')]
+        [psobject]$Object,
+        [Parameter(HelpMessage = 'hostname' )]
+        [string]$hostname = $Env:COMPUTERNAME,
+        [Parameter(HelpMessage = 'TagSet ex. "region=us-west"' )]
+        [string]$TagSet,
+        [parameter(HelpMessage = 'Timestamp ex (Get-Date)')]
+        [datetime]$TimeStamp
+    )
+    begin {
+        if ($TagSet) {
+            $TagSet = ',' + $TagSet
+        }
+        if ($TimeStamp) {
+            $Unixtime = [int64](($TimeStamp) - (get-date "1/1/1970")).TotalMilliseconds
+            $Unixtime = " " + $Unixtime.ToString()
+        }     
+    }
+    process {
+        $object.PSObject.Properties | ForEach-Object {
+            $name = $_.Name 
+            $value = $_.value
+            $row = "$name$TagSet,host=$hostname value=$value$Unixtime`r`n"
+            $lines += $row
+        }
+        return $lines
+    }
+
+}
+
+# Export-ModuleMebers
+Export-ModuleMember -Function 'Send-Query', 'Send-RawQuery', 'Invoke-Template', 'Send-Data', 'Send-Statsd', 'ConvertTo-LineProtocoll' -Alias *
