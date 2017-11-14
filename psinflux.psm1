@@ -51,41 +51,51 @@ function Send-Data( [string[]]$Lines, [string]$Server=$Env:INFLUX_SERVER, [strin
 <#
 .SYNOPSIS
     Send metrics to statsd server.
+
 .DESCRIPTION
-    Function sends metric data to statsd server.
-.PARAMETER Lines
-    Array of strings that contain statsd line protocol. If string is not enclosed in quotes (single or double), the pipe character needs to be escaped.
-.PARAMETER Ip
-    IP address of the statsd server.
-.PARAMETER Port
-    Port that statsd server is listening to, by default 8125
+    Function sends metric data to statsd/telegraf server.
+
 .EXAMPLE
     Send-Statsd "my_metric:123|g"
+
+    Send quoted line to default server and port
 .EXAMPLE
-    Send-Statsd "my_metric:123|g" -ip 127.0.0.1 -port 8125
+    Send-Statsd "my_metric:123|g" -Server 127.0.0.1 -port 8125
+
+    Send quoted line to specified server and port
 .EXAMPLE
-    Send-Statsd my_metric:321`|g -ip 10.0.0.10 -port 8180
-.EXAMPLE
-    Send-Statsd 'my_metric:321|g' -ip 10.0.0.10 -port 8180
+    Send-Statsd my_metric:321`|g
+
+    Send unquoted but escape pipe symobol
 .LINK
     https://www.influxdata.com/getting-started-with-sending-statsd-metrics-to-telegraf-influxdb/
     https://github.com/etsy/statsd/blob/master/docs/metric_types.md
 #>
 function Send-Statsd {
-
     param(
+        # Array of strings that contain statsd line protocol. 
+        # If string is not enclosed in quotes (single or double), the pipe character needs to be escaped.
         [parameter(Mandatory=$true, ValueFromPipeline=$true)]
         [string[]] $Lines,
 
-        [parameter(Mandatory=$true)]
-        [string] $Ip,
+        # Server name or ip address.
+        # Use the Env:INFLUX_SERVER by default without any port
+        [string] $Server = $Env:INFLUX_SERVER,
 
-        [int]    $Port = 8125
+        # Port that statsd server is listening to, by default 8125
+        [int] $Port = 8125
     )
 
-    $ipAddress = [System.Net.IPAddress]::Parse($ip)
+    if (!$script:StatsdServerIp) {
+        try { $script:StatsdServerIp = [System.Net.IPAddress]::Parse($Server) } catch {
+            $Server = $Server -replace ':[0-9]+' -replace 'https?://'
+            $Server = [system.net.dns]::GetHostAddresses($Server) | select -First 1 | % ToString
+            $script:StatsdServerIp = [System.Net.IPAddress]::Parse($Server)
+        }
+    }
 
-    $endPoint  = New-Object System.Net.IPEndPoint($ipAddress, $Port)
+    Write-Verbose "Using Statsd server:  ${script:StatsdServerIp}:$Port"
+    $endPoint  = New-Object System.Net.IPEndPoint($StatsdServerIp, $Port)
     $udpclient = New-Object System.Net.Sockets.UdpClient
 
     foreach ($line in $Lines) {
