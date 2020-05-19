@@ -13,7 +13,7 @@ $INPUT_PASS         = { Read-Host "Password" }
 
 ---
 
-select $SELECT_COLS from $LAST_MEASUREMENT limit 25
+select $SELECT_COLS from $LAST_MEASUREMENT order by desc limit 25
 
 show databases
 create database $INPUT_DB
