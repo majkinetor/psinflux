@@ -1,3 +1,19 @@
+if (!$Env:INFLUX_SERVER) { 
+    Write-Warning "Environment variable `$Env:INFLUX_SERVER not defined, using 'localhost' with default port" 
+    $Env:INFLUX_SERVER = "http://localhost:8086"
+}
+
+if (!$Env:INFLUX_DB) { 
+    Write-Warning "Environment variable `$Env:INFLUX_DB not defined, using test"
+    $Env:INFLUX_DB = 'test'
+}
+
+Write-Host
+Write-Host -NoNewLine -Foreground green 'SERVER'.PadRight(10)
+Write-Host $ENV:INFLUX_SERVER
+Write-Host -NoNewLine -Foreground green 'DB'.PadRight(10)
+Write-Host $ENV:INFLUX_DB "`n"
+
 <#
 .SYNOPSIS
     Send array of data points to InfluxDb
@@ -241,18 +257,6 @@ function ir([string]$q) {
     $r = "$Env:INFLUX_SERVER/query?q=$q"
     irm $r -UseBasicParsing
 }
-
-Write-Host
-
-if (!$Env:INFLUX_SERVER) { Write-Warning "Environment variable `$Env:INFLUX_SERVER not defined" } else {
-    Write-Host -NoNewLine -Foreground green 'SERVER'.PadRight(10)
-    Write-Host $ENV:INFLUX_SERVER
-}
-if (!$Env:INFLUX_DB) { Write-Warning "Environment variable `$Env:INFLUX_DB not defined" } else {
-    Write-Host -NoNewLine -Foreground green 'DB'.PadRight(10)
-    Write-Host $ENV:INFLUX_DB "`n"
-}
-
 
 <#
 .SYNOPSIS
