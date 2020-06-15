@@ -1,8 +1,8 @@
 # PSInflux
 
-This Powershell 3+ module uses Influx DB [HTTP API](https://docs.influxdata.com/influxdb/v1.2/guides/querying_data) to query and send data.
+This PowerShell 3+ module uses Influx DB [HTTP API](https://docs.influxdata.com/influxdb/v1.2/guides/querying_data) to query and send data.
 
-To install, clone this project then run: `cinst fzf; ./install.ps1`
+To install, clone this project then run: `./install.ps1`. To be able to use templated queries in interactive manner, you also need CLI tool [fzf](https://github.com/junegunn/fzf) that you can install via Chocolatey: [`cinst fzf`](https://chocolatey.org/packages/fzf)
 
 ## How to use
 
@@ -82,7 +82,7 @@ StatusCode StatusDescription Headers
        204 No Content        {[Request-Id, 04997ca0-2fee-11e7-8c51-000000000000], [X-Influxdb-Version, 1.2.2], [Content-Type, application/json], [Date, Wed, 03 May 2017 10:48:18 GMT]}
        ...
 
- 
+
 PS> iq select value from test1 order by time desc
 
 time                           value
@@ -109,4 +109,3 @@ You can use `Send-Statsd` to write to Statsd server. The following example uses 
 ```powershell
 Send-Statsd "mycounter,host=${Env:COMPUTERNAME}:10|c", "mycounter,host=MEH:100|c" -Ip 127.0.0.1
 ```
-
