@@ -8,7 +8,6 @@ if (!$Env:INFLUX_DB) {
     $Env:INFLUX_DB = 'test'
 }
 
-
 Write-Host
 Write-Host -NoNewLine -Foreground green '  INFLUX Server:'.PadRight(25)
 Write-Host $ENV:INFLUX_SERVER
@@ -62,7 +61,7 @@ function Send-Data( [string[]]$Lines, [string]$Server=$Env:INFLUX_SERVER, [strin
     #$authheader = "Basic " + ([Convert]::ToBase64String([System.Text.encoding]::ASCII.GetBytes("<username>:<password>")))
     #-Headers @{Authorization=$authheader}
     #$uri=”http://<hostname>:8086/write?db=test&precision=s”
-    iwr -UseBasicParsing -Method Post "$Server/write?db=$Db" -Body ($metrics -join "`n") | select StatusCode, StatusDescription, Headers
+    Invoke-WebRequest -UseBasicParsing -Method Post "$Server/write?db=$Db" -Body ($metrics -join "`n") | select StatusCode, StatusDescription, Headers
 }
 
 <#
@@ -165,13 +164,11 @@ function Send-Query() {
     }
     $res
 }
-sal iq Send-Query
-
+Set-Alias iq Send-Query
 
 <#
 .SYNOPSIS
     Execute raw InfluxDb query over HTTP API
-
 #>
 function Send-RawQuery() {
     if (!$args.Length) { Write-Warning 'No query specified'; return }
@@ -179,7 +176,7 @@ function Send-RawQuery() {
     $db = $Env:INFLUX_DB
     ir "$query&db=$db" | % results | % series
 }
-sal iqr Send-RawQuery
+Set-Alias iqr Send-RawQuery
 
 <#
 .SYNOPSIS
@@ -237,7 +234,7 @@ function Invoke-Template([string]$Selection, [string]$FilePath=$Env:INFLUX_TEMPL
     Write-Host "QUERY:`n" "    iq $equery"
     iq $equery
 }
-sal itemplate invoke-template
+Set-Alias itemplate invoke-template
 
 function fzf{
     param(
@@ -245,7 +242,7 @@ function fzf{
         [switch]$Edit
     )
 
-    if (!(gcm fzf.exe)) { throw "To use templates, fzf.exe must be on the PATH, see https://chocolatey.org/packages/fzf" }
+    if (!(Get-Command fzf.exe)) { throw "To use templates, fzf.exe must be on the PATH, see https://chocolatey.org/packages/fzf" }
 
     if ($Prompt) { $p = "--prompt=""${Prompt}: """ }
     if ($Edit)   { $e = "--print-query"  }
@@ -256,7 +253,7 @@ function fzf{
 function ir([string]$q) {
     if (!$Env:INFLUX_SERVER) {throw "Define `$Env:INFLUX_SERVER to use this module"}
     $r = "$Env:INFLUX_SERVER/query?q=$q"
-    irm $r -UseBasicParsing
+    Invoke-RestMethod $r -UseBasicParsing
 }
 
 <#
